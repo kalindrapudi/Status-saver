@@ -23,6 +23,10 @@ OpenAI and Gemini **API keys are still optional** in Muse Studio's Settings. The
 
 ## Get the APK
 
+**Direct download:** https://github.com/kalindrapudi/Status-saver/releases/latest/download/StatusStudio.apk
+
+Every build publishes a new release. To build one yourself:
+
 1. Push to this repository, or open **Actions → Build APK → Run workflow**.
 2. When the run finishes, download the **StatusStudio-apk** artifact and unzip it to get `StatusStudio.apk`.
 3. Open it on your phone and allow "Install unknown apps". If Android says the app conflicts with an existing package, uninstall the old Status Saver first. Each GitHub build is signed with a new debug key, so it can't update an older build.

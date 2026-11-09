@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write   # to publish the APK as a public release
 
 jobs:
   build:
@@ -37,3 +37,17 @@ jobs:
           name: StatusStudio-apk
           path: ${{ runner.temp }}/StatusStudio.apk
           if-no-files-found: error
+
+      # Public download link (no GitHub login needed):
+      # https://github.com/<owner>/<repo>/releases/latest/download/StatusStudio.apk
+      - name: Publish APK as a release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=$(sed -n "s/.*versionName '\(.*\)'.*/\1/p" app/build.gradle)
+          tag="v${version}-build${GITHUB_RUN_NUMBER}"
+          gh release create "$tag" "$RUNNER_TEMP/StatusStudio.apk" \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --latest \
+            --title "Status Studio ${version} (build ${GITHUB_RUN_NUMBER})" \
+            --notes "Install StatusStudio.apk on Android 10 or newer. If Android reports a conflict, uninstall the previous build first."
