@@ -1,0 +1,19 @@
+{
+  "name": "Muse Studio",
+  "short_name": "Muse",
+  "description": "Personal image styling studio: your photo + inspiration, generated with OpenAI and Gemini, compared and ranked.",
+  "start_url": "./#create",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f4ee",
+  "theme_color": "#f6f4ee",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ],
+  "share_target": {
+    "action": "./share-target",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": { "files": [{ "name": "images", "accept": ["image/png", "image/jpeg", "image/webp"] }] }
+  }
+}

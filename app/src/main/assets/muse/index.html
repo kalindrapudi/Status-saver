@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f6f4ee">
+<title>Muse Studio</title>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">✳ muse<span>.</span></div>
+  <span id="mode-pill" class="pill">Checking setup…</span>
+</header>
+
+<main>
+<!-- ================= CREATE ================= -->
+<section id="view-create" class="view">
+  <div class="hero">
+    <p class="eyebrow">Same you. New possibilities.</p>
+    <h1>Create studio</h1>
+    <button id="reset" class="btn ghost small">↻ Start fresh</button>
+  </div>
+
+  <!-- 1 Identity -->
+  <section class="card">
+    <div class="card-head"><h2><b>1</b> Your photo</h2><span class="tag">Identity</span></div>
+    <div class="source-row">
+      <button id="source-pick" class="drop">
+        <span class="drop-icon">＋</span><strong>Choose a photo</strong><small>JPG · PNG · WebP</small>
+      </button>
+      <div class="source-side">
+        <button id="source-from-library" class="btn ghost small">From my photos</button>
+        <p class="hint">A clear, well-lit face works best. Tag a <b>Person</b> in My photos to add more angles of the same person below.</p>
+      </div>
+    </div>
+    <div id="identity-extras" class="extras hidden">
+      <p class="hint">Extra identity photos of <b id="person-name"></b> (tap up to 3):</p>
+      <div id="extras-strip" class="strip"></div>
+    </div>
+  </section>
+
+  <!-- 2 Inspiration -->
+  <section class="card">
+    <div class="card-head"><h2><b>2</b> Inspiration</h2><span class="tag soft">Optional</span></div>
+    <div class="chips" id="categories">
+      <button class="chip on" data-cat="All">All</button><button class="chip" data-cat="Portraits">Portraits</button><button class="chip" data-cat="Fashion">Fashion</button><button class="chip" data-cat="Spaces">Spaces</button><button class="chip" data-cat="Art">Art</button>
+    </div>
+    <div class="search"><input id="keyword" placeholder="e.g. warm film portrait, saree editorial, Japandi room" aria-label="Keyword"><button id="suggest" class="btn small">✧ Suggest looks</button></div>
+    <div id="suggestions" class="suggestions"></div>
+    <div class="pinterest">
+      <div><strong>Find references on Pinterest</strong><small>Open a search, then share the Pin's image to Muse (Android) or save it and add it here.</small></div>
+      <div id="pin-queries" class="chips"></div>
+    </div>
+    <div class="ref-row">
+      <button id="ref-pick" class="btn ghost small">＋ Add style reference</button>
+      <div id="ref-selected" class="ref hidden"></div>
+    </div>
+  </section>
+
+  <!-- 3 Prompt -->
+  <section class="card">
+    <div class="card-head"><h2><b>3</b> Your vision</h2><button id="draft" class="link">✧ Help me write it</button></div>
+    <textarea id="prompt" rows="4" placeholder="e.g. Me in a sunlit café, warm film tones, relaxed pose. Keep my face and natural expression."></textarea>
+    <div class="chips" id="adders">
+      <button class="chip" data-add="Soft natural window light.">＋ Soft light</button>
+      <button class="chip" data-add="Relaxed, candid pose.">＋ Candid pose</button>
+      <button class="chip" data-add="Simple, uncluttered background.">＋ Clean background</button>
+      <button class="chip" data-add="Subtle analog film grain, warm colors.">＋ Film look</button>
+      <button class="chip" data-add="Full-length shot showing the whole outfit.">＋ Full length</button>
+      <button class="chip" data-add="Keep the original background.">＋ Keep background</button>
+    </div>
+    <details class="fine">
+      <summary>Fine-tune</summary>
+      <div class="grid2">
+        <label>Identity<select id="identity"><option value="strong">Keep my features closely</option><option value="balanced">Balance identity and style</option><option value="creative">Creative interpretation</option></select></label>
+        <label>Shape<select id="size"><option value="1024x1536">Portrait 2:3</option><option value="1024x1024">Square 1:1</option><option value="1536x1024">Landscape 3:2</option><option value="auto">Auto</option></select></label>
+        <label>Quality (OpenAI)<select id="quality"><option value="low">Draft · cheaper</option><option value="medium" selected>Balanced</option><option value="high">High · costlier</option></select></label>
+        <label>Variations per tool<select id="variations"><option>1</option><option selected>2</option><option>3</option></select></label>
+      </div>
+      <label>Avoid<input id="negative" placeholder="e.g. heavy makeup, text, extra fingers"></label>
+    </details>
+  </section>
+
+  <!-- 4 Tools + create -->
+  <section class="card">
+    <div class="card-head"><h2><b>4</b> Tools</h2><span id="cost-hint" class="tag soft"></span></div>
+    <div class="tools">
+      <label class="tool"><input type="checkbox" id="use-apps"> <span><strong>AI apps</strong><small>ChatGPT, Gemini, Claude… · your account, no API key</small></span></label>
+      <label class="tool"><input type="checkbox" id="use-openai"> <span><strong>OpenAI</strong><small id="openai-state">gpt-image · API key</small></span></label>
+      <label class="tool"><input type="checkbox" id="use-gemini"> <span><strong>Gemini</strong><small id="gemini-state">Nano Banana · API key</small></span></label>
+      <label class="tool"><input type="checkbox" id="use-demo"> <span><strong>Demo</strong><small>Offline test, no cost</small></span></label>
+    </div>
+    <label class="consent"><input type="checkbox" id="consent"> <span>Send the selected photos and prompt to the ticked API providers when I tap Create. (AI apps only get them when you tap an app below.)</span></label>
+    <button id="create" class="btn primary wide">Create ✧</button>
+    <div id="status" class="status hidden" role="status" aria-live="polite"></div>
+  </section>
+
+  <!-- Hand-off to AI apps (no API key) -->
+  <section id="apps-card" class="card hidden">
+    <div class="card-head"><h2>Create in an AI app</h2><button id="apps-copy" class="link">⧉ Copy prompt</button></div>
+    <p class="hint">Tap an app. Your photo(s) and the prompt go to it, using your own account. If the app is not installed, its website opens and you sign in once.</p>
+    <div id="apps-list" class="apps"></div>
+    <p class="hint">When the picture is ready, <b>share it back to Muse Studio</b> to compare, rank and keep it. You can also save it from the app.</p>
+  </section>
+
+  <!-- Results -->
+  <section id="results-card" class="card hidden">
+    <div class="card-head"><h2>Results</h2><button id="rank" class="btn small">★ Rank best match</button></div>
+    <p id="rank-note" class="hint">Scores are an AI opinion to help you choose — you decide.</p>
+    <div id="results" class="results"></div>
+    <div id="compare" class="compare hidden">
+      <div class="compare-box">
+        <img id="cmp-a" alt="Original">
+        <div id="cmp-clip" class="cmp-clip"><img id="cmp-b" alt="Result"></div>
+      </div>
+      <input id="cmp-range" type="range" min="0" max="100" value="50" aria-label="Compare slider">
+      <div class="compare-labels"><span>Original</span><span>Result</span></div>
+    </div>
+  </section>
+</section>
+
+<!-- ================= PHOTOS ================= -->
+<section id="view-photos" class="view hidden">
+  <div class="hero"><p class="eyebrow">Your starting points</p><h1>My photos</h1><button id="photos-add" class="btn primary small">＋ Add photos</button></div>
+  <div class="search"><input id="photos-search" placeholder="Search name, person or tags" aria-label="Search photos"></div>
+  <div id="people" class="chips"></div>
+  <p class="hint">Person names are labels you add — there is no automatic face recognition.</p>
+  <div id="photos-grid" class="grid"></div>
+</section>
+
+<!-- ================= SAVED ================= -->
+<section id="view-saved" class="view hidden">
+  <div class="hero"><p class="eyebrow">Worth keeping</p><h1>Saved</h1></div>
+  <div id="saved-grid" class="grid"></div>
+</section>
+
+<!-- ================= SETTINGS ================= -->
+<section id="view-settings" class="view hidden">
+  <div class="hero"><p class="eyebrow">Your tools, together</p><h1>Settings</h1></div>
+  <section class="card">
+    <h2>OpenAI</h2>
+    <label>API key<input id="key-openai" type="password" autocomplete="off" placeholder="sk-…"></label>
+    <div class="grid2">
+      <label>Image model<input id="m-openai" placeholder="gpt-image-1"></label>
+      <label>Assistant model<input id="m-openai-text" placeholder="gpt-4.1-mini"></label>
+    </div>
+    <label class="consent"><input type="checkbox" id="fidelity" checked> <span>High input fidelity (better face preservation, if the model supports it)</span></label>
+  </section>
+  <section class="card">
+    <h2>Google Gemini</h2>
+    <label>API key<input id="key-gemini" type="password" autocomplete="off" placeholder="AIza…"></label>
+    <div class="grid2">
+      <label>Image model<input id="m-gemini" placeholder="gemini-2.5-flash-image"></label>
+      <label>Assistant model<input id="m-gemini-text" placeholder="gemini-2.5-flash"></label>
+    </div>
+  </section>
+  <section class="card">
+    <h2>Assistant</h2>
+    <label>Use for suggestions and ranking<select id="assistant"><option value="auto">Auto (whichever key is set)</option><option value="openai">OpenAI</option><option value="gemini">Gemini</option><option value="demo">Demo (offline)</option></select></label>
+    <p class="hint"><b>API keys are optional.</b> Without them, use the <b>AI apps</b> tool, which works with your normal ChatGPT, Gemini or Claude account (free or paid). API usage is billed separately by each provider and is not part of ChatGPT Plus or Gemini subscriptions.</p>
+    <p id="key-storage" class="hint"></p>
+    <div class="row"><button id="save-settings" class="btn primary small">Save settings</button><button id="clear-keys" class="btn ghost small">Remove keys</button></div>
+  </section>
+  <section class="card">
+    <h2>Your data</h2>
+    <p class="hint">Photos and saved creations stay on this device (app storage). Nothing is uploaded until you tap Create, Suggest or Rank.</p>
+    <button id="clear-data" class="btn danger small">Delete all photos & creations</button>
+  </section>
+  <p class="hint center" id="version">Muse Studio</p>
+</section>
+</main>
+
+<nav class="tabbar" aria-label="Main">
+  <button data-view="create" class="on"><span>◈</span>Create</button>
+  <button data-view="photos"><span>▧</span>Photos <em id="count-photos">0</em></button>
+  <button data-view="saved"><span>♡</span>Saved <em id="count-saved">0</em></button>
+  <button data-view="settings"><span>⚙</span>Settings</button>
+</nav>
+
+<input type="file" id="file" accept="image/png,image/jpeg,image/webp" hidden>
+<div id="toast" class="toast hidden" role="status"></div>
+
+<dialog id="label-dialog">
+  <form method="dialog">
+    <h2>Label this photo</h2>
+    <label>Name<input id="lbl-name" maxlength="100"></label>
+    <label>Person<input id="lbl-person" maxlength="60" placeholder="e.g. Me, Amma, Ravi" list="people-list"></label>
+    <datalist id="people-list"></datalist>
+    <label>Tags<input id="lbl-tags" maxlength="200" placeholder="e.g. portrait, wedding, 2026"></label>
+    <div class="row end"><button value="cancel" class="btn ghost small">Cancel</button><button value="save" class="btn primary small">Save</button></div>
+  </form>
+</dialog>
+
+<dialog id="picker-dialog">
+  <form method="dialog">
+    <h2>Choose from my photos</h2>
+    <div id="picker-grid" class="grid small"></div>
+    <div class="row end"><button value="cancel" class="btn ghost small">Close</button></div>
+  </form>
+</dialog>
+
+<script src="providers.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
